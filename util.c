@@ -179,7 +179,7 @@ debug (const char *format, ...)
 }
 #else
 void
-debug (const char *, ...) {};
+debug (const char *format, ...) {};
 #endif
 
 void
