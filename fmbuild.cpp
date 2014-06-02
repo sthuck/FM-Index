@@ -19,6 +19,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <vector>
 
 #include "FM.h"
 
@@ -29,6 +30,7 @@ print_usage(const char *program)
 	fprintf(stderr, "  input : file to be indexed\n");
 	fprintf(stderr, "  index : index file [default = input.fm]\n");
 	fprintf(stderr, "  -v verbose output\n");
+	fprintf(stderr, "  -d build file with debug information\n");
     fprintf(stderr, "  -s samplerate [default = %d]\n",DEFAULT_SAMPLERATE);
     fprintf(stderr, "\n");
     fprintf(stderr, "EXAMPLE: %s alice29.txt alice29.fm\n",program);
@@ -46,6 +48,7 @@ int main(int argc, char** argv) {
     FM* FMIdx;
     uint8_t* T;
     uint32_t n;
+    uint8_t debugFile=0;
     char buf[4096];
     
     /* parse command line parameter */
@@ -57,13 +60,16 @@ int main(int argc, char** argv) {
 	opt = -1;
     idxname = inname = NULL;
     samplerate = DEFAULT_SAMPLERATE;
-    while ((opt = getopt(argc, argv, "vhs:")) != -1) {
+    while ((opt = getopt(argc, argv, "vdhs:")) != -1) {
         switch (opt) {
             case 's':
                 samplerate = atoi(optarg);
                 break;
 			case 'v':
 				FM::verbose = 1;
+				break;
+			case 'd':
+				debugFile = 1;
 				break;
             case 'h':
             default:
@@ -93,7 +99,7 @@ int main(int argc, char** argv) {
 	fclose(f);
         
 	/* build index */
-	FMIdx = new FM(T,n,samplerate);
+	FMIdx = new FM(T,n,debugFile,samplerate);
 	
 	if(!FMIdx) {
 		perror("error building index");
